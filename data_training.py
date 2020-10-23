@@ -16,7 +16,7 @@ from keras import layers
 
 def generating_dataset():
     # generating a dataset
-    header = 'filename chroma_stft rmse spectral_centroid spectral_bandwidth rolloff zero_crossing_rate'
+    header = 'filename chroma_stft rmse spectral_centroid spectral_bandwidth rolloff zero_crossing_rate tempo'
     for i in range(1, 21):
         header += f' mfcc{i}'
     header += ' label'
@@ -40,7 +40,7 @@ def generating_dataset():
             spec_cent = librosa.feature.spectral_centroid(y=y, sr=sr)
             spec_bw = librosa.feature.spectral_bandwidth(y=y, sr=sr)
             rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr)
-            tempo = librosa.feature.tempogram(y=y,sr=sr) #Tempo is a big thing for Salsa
+            tempo = librosa.feature.tempogram(y=y,sr=sr) #Tempo is a big thing for latin music
             zcr = librosa.feature.zero_crossing_rate(y)
             mfcc = librosa.feature.mfcc(y=y, sr=sr) #This is 100% useful
             to_append = f'{filename} {np.mean(chroma_stft)} {np.mean(rmse)} {np.mean(spec_cent)} {np.mean(spec_bw)} {np.mean(rolloff)} {np.mean(zcr)} {np.mean(tempo)}'
