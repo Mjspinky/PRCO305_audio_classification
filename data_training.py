@@ -12,45 +12,60 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 import keras
 from keras import models
 from keras import layers
+import ffmpeg
 
 
-def generating_dataset():
-    # generating a dataset
+def create_header():
     header = 'filename chroma_stft rmse spectral_centroid spectral_bandwidth rolloff zero_crossing_rate tempo'
     for i in range(1, 21):
         header += f' mfcc{i}'
     header += ' label'
     header = header.split()
+    return header
 
-    file = open('data.csv', 'w', newline='')
+
+def create_data_file(data_goes_here):
+    file = open(data_goes_here, 'w', newline='')
     with file:
         writer = csv.writer(file)
-        writer.writerow(header)
-        # TODO:Remove a few of these from the the list in some tests(It will take a while) once you've got some
-        #  decent amounts of confirmed latin musics
+        writer.writerow(create_header())
+
+
+def create_data(song_name, file_name, g, data_goes_here):
+    y, sr = librosa.load(song_name, mono=True, duration=30)
+    chroma_stft = librosa.feature.chroma_stft(y=y, sr=sr)
+    rmse = librosa.feature.rms(y=y)
+    spec_cent = librosa.feature.spectral_centroid(y=y, sr=sr)
+    spec_bw = librosa.feature.spectral_bandwidth(y=y, sr=sr)
+    rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr)
+    tempo = librosa.feature.tempogram(y=y, sr=sr)  # Tempo is a big thing for latin music
+    zcr = librosa.feature.zero_crossing_rate(y)
+    mfcc = librosa.feature.mfcc(y=y, sr=sr)  # This is 100% useful
+
+    to_append = f'{file_name} {np.mean(chroma_stft)} {np.mean(rmse)} {np.mean(spec_cent)} {np.mean(spec_bw)} {np.mean(rolloff)} {np.mean(zcr)} {np.mean(tempo)}'
+    for e in mfcc:
+        to_append += f' {np.mean(e)}'
+    to_append += f' {g}'
+    file = open(data_goes_here, 'a', newline='')
+    with file:
+        writer = csv.writer(file)
+        writer.writerow(to_append.split())
+
+
+def generating_dataset():
+    # generating a dataset
+
+    data_goes_here = 'data.csv'
+    create_data_file(data_goes_here)
+    # TODO:Remove a few of these from the the list in some tests(It will take a while) once you've got some
+    # decent amounts of confirmed latin musics
     genres = 'blues classical country disco hiphop jazz metal pop reggae rock salsa'.split()
     for g in genres:
         for filename in os.listdir(f'./genres/{g}'):
-            songname = f'./genres/{g}/{filename}'
-            y, sr = librosa.load(songname, mono=True, duration=30)
             # TODO:Research what each of these mean and do, potentially add in one or two more of the librosa number
             #  generators
-            chroma_stft = librosa.feature.chroma_stft(y=y, sr=sr)
-            rmse = librosa.feature.rms(y=y)
-            spec_cent = librosa.feature.spectral_centroid(y=y, sr=sr)
-            spec_bw = librosa.feature.spectral_bandwidth(y=y, sr=sr)
-            rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr)
-            tempo = librosa.feature.tempogram(y=y,sr=sr) #Tempo is a big thing for latin music
-            zcr = librosa.feature.zero_crossing_rate(y)
-            mfcc = librosa.feature.mfcc(y=y, sr=sr) #This is 100% useful
-            to_append = f'{filename} {np.mean(chroma_stft)} {np.mean(rmse)} {np.mean(spec_cent)} {np.mean(spec_bw)} {np.mean(rolloff)} {np.mean(zcr)} {np.mean(tempo)}'
-            for e in mfcc:
-                to_append += f' {np.mean(e)}'
-            to_append += f' {g}'
-            file = open('data.csv', 'a', newline='')
-            with file:
-                writer = csv.writer(file)
-                writer.writerow(to_append.split())
+            songname = f'./genres/{g}/{filename}'
+            create_data(songname, filename, g, data_goes_here)
 
 
 def dataset_training():
@@ -111,23 +126,48 @@ def dataset_training():
     np.argmax(predictions[0])
 
 
+def test_data_preparation():
+    try:
+        # File conversion
+        stream = ffmpeg.input('current_recording.wav')
+        stream = ffmpeg.output(stream, 'current_recording.au')
+        ffmpeg.run(stream)
+        # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
+        # data to process
+        data_goes_here = 'recorded_data.csv'
+        create_data_file(data_goes_here)
+
+        songname = 'current_recording.au'
+        create_data(songname, songname, 'test', data_goes_here)
+
+        # remove old file
+        dir_name = "."
+        test = os.listdir(dir_name)
+        for item in test:
+            if item.endswith(".wav"):
+                os.remove(os.path.join(dir_name, item))
+    except:
+        print("No new recording, Skipping new data preparation")
+
+
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
 
 # TODO:This is commented out to make sure this isnt doing this every single time as this is the part that takes all
 #  the time, you should only need to do this when the dataset changes.
+test_data_preparation()
 
-#generating_dataset()
-
-now = datetime.now()
-current_time = now.strftime("%H:%M:%S")
-print("Current Time =", current_time)
-
-dataset_training()
+# generating_dataset()
 
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
 
-#TODO:Tensorflow tests?
+# dataset_training()
+
+now = datetime.now()
+current_time = now.strftime("%H:%M:%S")
+print("Current Time =", current_time)
+
+# TODO:Tensorflow tests?
