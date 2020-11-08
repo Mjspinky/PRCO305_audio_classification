@@ -137,8 +137,8 @@ def test_data_preparation():
         data_goes_here = 'recorded_data.csv'
         create_data_file(data_goes_here)
 
-        songname = 'current_recording.au'
-        create_data(songname, songname, 'test', data_goes_here)
+        song_name = 'current_recording.au'
+        create_data(song_name, song_name, 'test', data_goes_here)
 
         # remove old file
         dir_name = "."
@@ -155,7 +155,7 @@ current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
 
 # TODO:This is commented out to make sure this isnt doing this every single time as this is the part that takes all
-#  the time, you should only need to do this when the dataset changes.
+#   the time, you should only need to do this when the dataset changes.
 test_data_preparation()
 
 # generating_dataset()
