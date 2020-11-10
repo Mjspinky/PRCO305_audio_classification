@@ -31,26 +31,26 @@ def delete_unnecessary_files(genre):
 
 def file_rename(genre):
     for count, filename in enumerate(os.listdir(f'./genres/{genre}/')):
-        dst = f"{genre}." + str(count + 1) + ".mp3"
-        src = f'./genres/{genre}/' + filename
-        dst = f'./genres/{genre}/' + dst
-
-        os.rename(src, dst)
+        pattern = f'[{genre}]+.[0-9]+.au'
+        if not re.match(pattern, filename):
+            dst = f"{genre}." + str(count + 1) + ".au"
+            src = f'./genres/{genre}/' + filename
+            dst = f'./genres/{genre}/' + dst
+            os.rename(src, dst)
 
 
 def check_for_new_songs():
     flag = 0
     for folder in os.listdir(f'./genres/'):
-        folder_name_length = len(folder)
-        pattern = f'[{folder}]{folder_name_length}[0-9]+.au'
+        pattern = f'[{folder}]+.[0-9]+.au'
         for filename in os.listdir(f'./genres/{folder}/'):
-            if not re.match(pattern, filename):  # TODO:Check this regex [\{genre\}]{len(folder)}[0-9]+.au
-                file_rename(folder)
-                audio_clipping(folder)
-                mp3_to_au_convert(folder)
+            if not re.match(pattern, filename):
+                audio_clipping(filename, folder)
+                mp3_to_au_convert(filename, folder)
                 flag = 1
         if flag == 1:
             delete_unnecessary_files(folder)
+            file_rename(folder)
 
 
 check_for_new_songs()
