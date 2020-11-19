@@ -105,7 +105,7 @@ def dataset_training():
 
     model.add(layers.Dense(128, activation='relu'))
 
-    model.add(layers.Dense(16, activation='softmax'))
+    model.add(layers.Dense(16, activation='sigmoid'))
 
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
@@ -120,7 +120,7 @@ def dataset_training():
     print("Calculate accuracy")
     test_loss, test_acc = model.evaluate(X_test, y_test)
     print('test_acc: ', test_acc)
-
+    model.save("models/data_model")
     # predictions
     predictions = model.predict(X_test)
     np.argmax(predictions[0])
@@ -156,7 +156,7 @@ print("Current Time =", current_time)
 
 # TODO:This is commented out to make sure this isnt doing this every single time as this is the part that takes all
 #   the time, you should only need to do this when the dataset changes.
-test_data_preparation()
+#test_data_preparation()
 
 # generating_dataset()
 
@@ -164,7 +164,7 @@ now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
 
-# dataset_training()
+dataset_training()
 
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
