@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class AudioClassificationConfig(AppConfig):
+class AudioClassificationAppConfig(AppConfig):
     name = 'audio_classification_app'

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-from audio_classification_app import apps
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,7 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'audio_classification_app.apps.AudioClassificationConfig'
+    'audio_classification_app.apps.AudioClassificationAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
