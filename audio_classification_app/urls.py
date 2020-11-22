@@ -5,4 +5,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('<str:filename>/results/', views.results, name='results'),
+    path('recording', views.recording, name='recording'),
+
 ]

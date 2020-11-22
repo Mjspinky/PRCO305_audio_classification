@@ -1,7 +1,6 @@
 import librosa
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from datetime import datetime
 import os
 import csv
@@ -9,9 +8,8 @@ import csv
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 # Keras
-import keras
-from keras import models
-from keras import layers
+from keras import models, layers
+from tensorflow.keras.models import load_model
 import ffmpeg
 
 
@@ -128,46 +126,39 @@ def dataset_training():
 
 def test_data_preparation():
     try:
-        # File conversion
-        stream = ffmpeg.input('current_recording.wav')
-        stream = ffmpeg.output(stream, 'current_recording.au')
-        ffmpeg.run(stream)
-        # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
-        # data to process
-        data_goes_here = 'recorded_data.csv'
-        create_data_file(data_goes_here)
-
-        song_name = 'current_recording.au'
-        create_data(song_name, song_name, 'test', data_goes_here)
-
-        # remove old file
         dir_name = "."
         test = os.listdir(dir_name)
         for item in test:
             if item.endswith(".wav"):
+                for file in test:
+                    if file.endswith(".au"):
+                        os.remove(os.path.join(dir_name, file))
+
+                # File conversion
+                stream = ffmpeg.input('current_recording.wav')
+                stream = ffmpeg.output(stream, 'current_recording.au')
+                ffmpeg.run(stream)
+                # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
+                # data to process
+                data_goes_here = 'recorded_data.csv'
+                create_data_file(data_goes_here)
+
+                song_name = 'current_recording.au'
+                create_data(song_name, song_name, 'test', data_goes_here)
+
                 os.remove(os.path.join(dir_name, item))
     except:
         print("No new recording, Skipping new data preparation")
 
 
-now = datetime.now()
-current_time = now.strftime("%H:%M:%S")
-print("Current Time =", current_time)
+def get_time():
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
 
-# TODO:This is commented out to make sure this isnt doing this every single time as this is the part that takes all
-#   the time, you should only need to do this when the dataset changes.
-#test_data_preparation()
 
-# generating_dataset()
-
-now = datetime.now()
-current_time = now.strftime("%H:%M:%S")
-print("Current Time =", current_time)
-
-dataset_training()
-
-now = datetime.now()
-current_time = now.strftime("%H:%M:%S")
-print("Current Time =", current_time)
-
+def model_predict():
+    model = load_model("models/data_model/saved_model.pb")
+    return model.predict()
+# test_data_preparation()
 # TODO:Tensorflow tests?
