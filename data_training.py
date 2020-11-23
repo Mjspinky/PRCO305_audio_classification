@@ -2,6 +2,7 @@ import librosa
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import matplotlib.pyplot as plt
 import os
 import csv
 # Preprocessing
@@ -10,6 +11,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 # Keras
 from keras import models, layers
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 import ffmpeg
 
 
@@ -111,9 +113,12 @@ def dataset_training():
 
     history = model.fit(X_train,
                         y_train,
-                        epochs=500,
+                        epochs=50,
                         batch_size=128)
-
+    metrics = history.history
+    plt.plot(history.epoch, metrics['loss'])
+    plt.legend(['loss'])
+    plt.show()
     # calculate accuracy
     print("Calculate accuracy")
     test_loss, test_acc = model.evaluate(X_test, y_test)
@@ -121,7 +126,7 @@ def dataset_training():
     model.save("models/data_model")
     # predictions
     predictions = model.predict(X_test)
-    np.argmax(predictions[0])
+    print(np.argmax(predictions[0]))
 
 
 def test_data_preparation():
@@ -157,8 +162,36 @@ def get_time():
     print("Current Time =", current_time)
 
 
+# TODO: this bit, this is where you are now
+
 def model_predict():
-    model = load_model("models/data_model/saved_model.pb")
+    model = load_model("models/data_model/")
+
+    print("reading recorded_data.csv")
+    data = pd.read_csv('recorded_data.csv')
+    data.head()
+    # Dropping unneccesary columns
+    print("dropping unnessesary columns")
+    data = data.drop(['filename'], axis=1)
+    data.head()
+    # normalizing
+    print("normalising")
+    x = np.transpose(data)
+
+    scaler = StandardScaler()
+    X = scaler.fit_transform(np.array(data.iloc[:, :-1], dtype=float))
+    print(X)
+
+    predictions = model.predict(data)
+    print(np.argmax(predictions[0]))
     return model.predict()
+
+
+# def represent_prediction():
+
+
 # test_data_preparation()
 # TODO:Tensorflow tests?
+# dataset_training()
+
+model_predict()
