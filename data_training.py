@@ -2,7 +2,6 @@ import librosa
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import matplotlib.pyplot as plt
 import os
 import csv
 # Preprocessing
@@ -11,8 +10,8 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 # Keras
 from keras import models, layers
 from tensorflow.keras.models import load_model
-import tensorflow as tf
 import ffmpeg
+import glob
 
 
 def create_header():
@@ -55,7 +54,7 @@ def create_data(song_name, file_name, g, data_goes_here):
 def generating_dataset():
     # generating a dataset
 
-    data_goes_here = 'data.csv'
+    data_goes_here = 'processed_data/data.csv'
     create_data_file(data_goes_here)
     # TODO:Remove a few of these from the the list in some tests(It will take a while) once you've got some
     # decent amounts of confirmed latin musics
@@ -71,7 +70,7 @@ def generating_dataset():
 def dataset_training():
     # reading dataset from csv
     print("reading Dataset")
-    data = pd.read_csv('data.csv')
+    data = pd.read_csv('processed_data/data.csv')
     data.head()
 
     # Dropping unneccesary columns
@@ -83,7 +82,6 @@ def dataset_training():
     encoder = LabelEncoder()
     y = encoder.fit_transform(genre_list)
     print(y)
-
     # normalizing
     print("normalising")
     scaler = StandardScaler()
@@ -105,7 +103,7 @@ def dataset_training():
 
     model.add(layers.Dense(128, activation='relu'))
 
-    model.add(layers.Dense(16, activation='sigmoid'))
+    model.add(layers.Dense(11, activation='sigmoid'))  # has to be above the number of Genres being tested
 
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
@@ -115,10 +113,7 @@ def dataset_training():
                         y_train,
                         epochs=50,
                         batch_size=128)
-    metrics = history.history
-    plt.plot(history.epoch, metrics['loss'])
-    plt.legend(['loss'])
-    plt.show()
+
     # calculate accuracy
     print("Calculate accuracy")
     test_loss, test_acc = model.evaluate(X_test, y_test)
@@ -145,7 +140,7 @@ def test_data_preparation():
                 ffmpeg.run(stream)
                 # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
                 # data to process
-                data_goes_here = 'recorded_data.csv'
+                data_goes_here = 'processed_data/recorded_data.csv'
                 create_data_file(data_goes_here)
 
                 song_name = 'current_recording.au'
@@ -162,36 +157,62 @@ def get_time():
     print("Current Time =", current_time)
 
 
-# TODO: this bit, this is where you are now
+# TODO: this bit, this is where you are now, you only need to get X in the right matrix dimensions
 
 def model_predict():
     model = load_model("models/data_model/")
 
-    print("reading recorded_data.csv")
-    data = pd.read_csv('recorded_data.csv')
+    extension = 'csv'
+    all_filenames = [i for i in glob.glob('processed_data/*.{}'.format(extension))]
+
+    # combine all files in the list
+    combined_data = pd.concat([pd.read_csv(f) for f in all_filenames])
+    combined_data.to_csv("processed_data/combined_csv.csv", index=False, encoding='utf-8-sig')
+
+    data = pd.read_csv('processed_data/combined_csv.csv')
+    os.remove(os.path.join('processed_data/', 'combined_csv.csv'))
     data.head()
-    # Dropping unneccesary columns
+
     print("dropping unnessesary columns")
     data = data.drop(['filename'], axis=1)
     data.head()
-    # normalizing
+
     print("normalising")
-    x = np.transpose(data)
-
     scaler = StandardScaler()
-    X = scaler.fit_transform(np.array(data.iloc[:, :-1], dtype=float))
-    print(X)
-
-    predictions = model.predict(data)
+    normalized_data = scaler.fit_transform(np.array(data.iloc[:, :-1], dtype=float))
+    X = normalized_data[-1, :]
+    # X = np.transpose(X)
+    predictions = model.predict(X)
     print(np.argmax(predictions[0]))
-    return model.predict()
 
 
-# def represent_prediction():
+def test_csv_data_creation():
+    data_goes_here = 'processed_data/recorded_data.csv'
+    create_data_file(data_goes_here)
+
+    song_name = 'current_recording.au'
+    create_data(song_name, song_name, 'test', data_goes_here)
 
 
-# test_data_preparation()
+def represent_prediction(prediction):
+    genre_list = {
+        0: "Blues",
+        1: "classical",
+        2: "country",
+        3: "disco",
+        4: "hiphop",
+        5: "jazz",
+        6: "metal",
+        7: "pop",
+        8: "reggae",
+        9: "rock",
+        10: "salsa",
+    }
+    return genre_list.get(prediction, "Cannot determine the right style")
+
+
 # TODO:Tensorflow tests?
 # dataset_training()
-
+# test_csv_data_creation()
 model_predict()
+# test_data_preparation()
