@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from utils.data_training import recorded_data_preparation
+from utils.recorded_data_processing import recorded_data_preparation
 from utils.audio_recording import audio_record
 from .models import AudioClip
 
