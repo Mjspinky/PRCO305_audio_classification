@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from utils.recorded_data_processing import recorded_data_preparation
 from utils.audio_recording import audio_record
 from .models import AudioClip
@@ -17,9 +17,16 @@ def results(request, filename):
 
 def recording(request):
     audio_record()
-    recorded_data_preparation()
-    # context = test_data(request.POST['filename'])
-    response = "Please wait for processing"
-    return HttpResponse(response)
+    return redirect("processing_request")
+
+
+def processing_request(request):
+    return render(request, 'process.html'
+
+
+def processing(request):
+    prediction = recorded_data_preparation()
+    context = {'prediction': prediction}
+    return render(request, 'result.html', context)
 
 # def test_data(filename):

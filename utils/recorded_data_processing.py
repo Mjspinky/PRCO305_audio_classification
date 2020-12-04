@@ -11,31 +11,31 @@ import glob
 from utils.data_processing_utils import create_data_file, create_data
 
 def recorded_data_preparation():
-    try:
-        dir_name = ".utils"
-        test = os.listdir(dir_name)
-        for item in test:
-            if item.endswith(".wav"):
-                for file in test:
-                    if file.endswith(".au"):
-                        os.remove(os.path.join(dir_name, file))
-                print("hello")
-                # File conversion
-                stream = ffmpeg.input('current_recording.wav')
-                stream = ffmpeg.output(stream, 'current_recording.au')
-                ffmpeg.run(stream)
-                # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
-                # data to process;
-                data_goes_here = '../processed_data/recorded_data.csv'
-                create_data_file(data_goes_here)
+    # try:
+    dir_name = "."
+    test = os.listdir(dir_name)
+    for item in test:
+        if item.endswith(".wav"):
+            for file in test:
+                if file.endswith(".au"):
+                    os.remove(os.path.join(dir_name, file))
+            print("hello")
+            # File conversion
+            stream = ffmpeg.input('current_recording.wav')
+            stream = ffmpeg.output(stream, 'current_recording.au')
+            ffmpeg.run(stream)
+            # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
+            # data to process;
+            data_goes_here = '../processed_data/recorded_data.csv'
+            create_data_file(data_goes_here)
 
-                song_name = 'current_recording.au'
-                create_data(song_name, song_name, 'test', data_goes_here)
+            song_name = 'current_recording.au'
+            create_data(song_name, song_name, 'test', data_goes_here)
 
-                os.remove(os.path.join(dir_name, item))
-    except:
-        print("No new recording, Skipping new data preparation")
-    model_predict()
+            os.remove(os.path.join(dir_name, item))
+    # except:
+    #    print("No new recording, Skipping new data preparation")
+    return model_predict()
 
 
 
@@ -44,14 +44,14 @@ def model_predict():
     model = load_model("../models/data_model/")
 
     extension = 'csv'
-    all_filenames = [i for i in glob.glob('../processed_data/*.{}'.format(extension))]
+    all_filenames = [i for i in glob.glob('./processed_data/*.{}'.format(extension))]
 
     # combine all files in the list
     combined_data = pd.concat([pd.read_csv(f) for f in all_filenames])
-    combined_data.to_csv("../processed_data/combined_csv.csv", index=False, encoding='utf-8-sig')
+    combined_data.to_csv("./processed_data/combined_csv.csv", index=False, encoding='utf-8-sig')
 
-    data = pd.read_csv('../processed_data/combined_csv.csv')
-    os.remove(os.path.join('../processed_data/', 'combined_csv.csv'))
+    data = pd.read_csv('./processed_data/combined_csv.csv')
+    os.remove(os.path.join('./processed_data/', 'combined_csv.csv'))
     data.head()
 
     print("dropping unnessesary columns")
