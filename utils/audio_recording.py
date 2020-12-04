@@ -9,7 +9,7 @@ def audio_record():
     RATE = 44100
     CHUNK = 1024
     RECORD_SECONDS = 31
-    WAVE_OUTPUT_FILENAME = "current_recording.wav"
+    WAVE_OUTPUT_FILENAME = "utils/current_recording.wav"
 
     audio = pyaudio.PyAudio()
 

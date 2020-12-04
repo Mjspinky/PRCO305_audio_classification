@@ -62,4 +62,4 @@ def dataset_training():
     print(np.argmax(predictions[0]))
 
 
-dataset_training()
+# ;dataset_training()

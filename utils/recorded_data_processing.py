@@ -12,14 +12,14 @@ from utils.data_processing_utils import create_data_file, create_data
 
 def recorded_data_preparation():
     try:
-        dir_name = ".."
+        dir_name = ".utils"
         test = os.listdir(dir_name)
         for item in test:
             if item.endswith(".wav"):
                 for file in test:
                     if file.endswith(".au"):
                         os.remove(os.path.join(dir_name, file))
-
+                print("hello")
                 # File conversion
                 stream = ffmpeg.input('current_recording.wav')
                 stream = ffmpeg.output(stream, 'current_recording.au')
@@ -35,6 +35,7 @@ def recorded_data_preparation():
                 os.remove(os.path.join(dir_name, item))
     except:
         print("No new recording, Skipping new data preparation")
+    model_predict()
 
 
 
