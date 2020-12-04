@@ -12,7 +12,7 @@ from utils.data_processing_utils import create_data_file, create_data
 
 def recorded_data_preparation():
     # try:
-    dir_name = "."
+    dir_name = "./utils"
     test = os.listdir(dir_name)
     for item in test:
         if item.endswith(".wav"):
@@ -21,15 +21,15 @@ def recorded_data_preparation():
                     os.remove(os.path.join(dir_name, file))
             print("hello")
             # File conversion
-            stream = ffmpeg.input('current_recording.wav')
-            stream = ffmpeg.output(stream, 'current_recording.au')
+            stream = ffmpeg.input('utils/current_recording.wav')
+            stream = ffmpeg.output(stream, 'utils/current_recording.au')
             ffmpeg.run(stream)
             # if there is no .wav file it will break before this point, so the rest of this is only ever done if its got new
             # data to process;
-            data_goes_here = '../processed_data/recorded_data.csv'
+            data_goes_here = './processed_data/recorded_data.csv'
             create_data_file(data_goes_here)
 
-            song_name = 'current_recording.au'
+            song_name = 'utils/current_recording.au'
             create_data(song_name, song_name, 'test', data_goes_here)
 
             os.remove(os.path.join(dir_name, item))

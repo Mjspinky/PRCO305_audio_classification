@@ -21,7 +21,7 @@ def recording(request):
 
 
 def processing_request(request):
-    return render(request, 'process.html'
+    return render(request, 'process.html')
 
 
 def processing(request):
