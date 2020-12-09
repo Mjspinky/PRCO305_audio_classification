@@ -4,9 +4,6 @@ import ffmpeg
 import re
 
 
-# TODO:Properly go through each salsa track and determine if its salsa, bachata, etc
-# TODO:Find more music on fma adding in Cha Cha, Bachata and Kizomba to the genre lists
-
 def audio_clipping(filename, genre):
     song = AudioSegment.from_mp3(f'./genres/{genre}/{filename}')
     thirty_seconds = 30 * 1000
@@ -41,7 +38,7 @@ def file_rename(genre):
 
 def check_for_new_songs():
     flag = 0
-    for folder in os.listdir(f'../genres/'):
+    for folder in os.listdir(f'./genres/'):
         pattern = f'[{folder}]+.[0-9]+.au'
         for filename in os.listdir(f'./genres/{folder}/'):
             if not re.match(pattern, filename):

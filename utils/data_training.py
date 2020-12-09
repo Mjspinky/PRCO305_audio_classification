@@ -41,7 +41,7 @@ def dataset_training():
 
     model.add(layers.Dense(128, activation='relu'))
 
-    model.add(layers.Dense(11, activation='sigmoid'))  # has to be above the number of Genres being tested
+    model.add(layers.Dense(14, activation='sigmoid'))  # has to be above the number of Genres being tested
 
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
@@ -56,10 +56,10 @@ def dataset_training():
     print("Calculate accuracy")
     test_loss, test_acc = model.evaluate(X_test, y_test)
     print('test_acc: ', test_acc)
-    model.save("../models/data_model")
+    model.save("./models/data_model")
     # predictions
     predictions = model.predict(X_test)
     print(np.argmax(predictions[0]))
 
 
-# ;dataset_training()
+dataset_training()

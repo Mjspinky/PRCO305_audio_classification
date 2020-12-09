@@ -70,17 +70,10 @@ def model_predict():
 
 def represent_prediction(prediction):
     genre_list = {
-        0: "Blues",
-        1: "Classical",
-        2: "Country",
-        3: "Disco",
-        4: "Hiphop",
-        5: "Jazz",
-        6: "Metal",
-        7: "Pop",
-        8: "Reggae",
-        9: "Rock",
-        10: "Salsa",
+        0: "Batchata",
+        2: "Cha Cha",
+        8: "Kizomba",
+        13: "Salsa",
     }
     return genre_list.get(prediction, "Cannot determine the right style")
 

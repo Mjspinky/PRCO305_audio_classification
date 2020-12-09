@@ -41,13 +41,16 @@ def create_data(song_name, file_name, g, data_goes_here):
         writer.writerow(to_append.split())
 
 
-def generating_dataset(): # this takes 30+ minutes to run, run this at your own caution
+def generating_dataset():  # this takes 30+ minutes to run, run this at your own caution
     # generating a dataset
 
     data_goes_here = '../processed_data/data.csv'
     create_data_file(data_goes_here)
-    genres = 'blues classical country disco hiphop jazz metal pop reggae rock salsa'.split()
+    genres = 'bachata blues cha_cha classical country disco hiphop jazz kizomba metal pop reggae rock salsa'.split()
     for g in genres:
-        for filename in os.listdir(f'./genres/{g}'):
-            songname = f'./genres/{g}/{filename}'
+        for filename in os.listdir(f'../genres/{g}'):
+            songname = f'../genres/{g}/{filename}'
             create_data(songname, filename, g, data_goes_here)
+
+
+generating_dataset()
