@@ -46,11 +46,10 @@ def generating_dataset():  # this takes 30+ minutes to run, run this at your own
 
     data_goes_here = '../processed_data/data.csv'
     create_data_file(data_goes_here)
-    genres = 'bachata blues cha_cha classical country disco hiphop jazz kizomba metal pop reggae rock salsa'.split()
+    genres = 'bachata cha_cha kizomba salsa'.split()
     for g in genres:
         for filename in os.listdir(f'../genres/{g}'):
             songname = f'../genres/{g}/{filename}'
             create_data(songname, filename, g, data_goes_here)
 
-
-generating_dataset()
+# generating_dataset()

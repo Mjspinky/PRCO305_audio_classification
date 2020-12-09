@@ -10,6 +10,7 @@ import glob
 
 from utils.data_processing_utils import create_data_file, create_data
 
+
 def recorded_data_preparation():
     # try:
     dir_name = "./utils"
@@ -19,7 +20,6 @@ def recorded_data_preparation():
             for file in test:
                 if file.endswith(".au"):
                     os.remove(os.path.join(dir_name, file))
-            print("hello")
             # File conversion
             stream = ffmpeg.input('utils/current_recording.wav')
             stream = ffmpeg.output(stream, 'utils/current_recording.au')
@@ -33,15 +33,19 @@ def recorded_data_preparation():
             create_data(song_name, song_name, 'test', data_goes_here)
 
             os.remove(os.path.join(dir_name, item))
+
     # except:
     #    print("No new recording, Skipping new data preparation")
     return model_predict()
 
 
-
-
 def model_predict():
-    model = load_model("../models/data_model/")
+    dir_name = "./utils"
+    test = os.listdir(dir_name)
+    for file in test:
+        if file.endswith(".au"):
+            os.remove(os.path.join(dir_name, file))
+    model = load_model("./models/new_model")
 
     extension = 'csv'
     all_filenames = [i for i in glob.glob('./processed_data/*.{}'.format(extension))]
@@ -64,18 +68,18 @@ def model_predict():
     X = normalized_data[-1]
     test = [float(i) for i in X]
     predictions = model.predict([test])
-    print(represent_prediction(np.argmax(predictions[0])))
+    print(np.argmax(predictions[0]))
     return represent_prediction(np.argmax(predictions[0]))
 
 
 def represent_prediction(prediction):
     genre_list = {
         0: "Batchata",
-        2: "Cha Cha",
-        8: "Kizomba",
-        13: "Salsa",
+        1: "Cha Cha",
+        2: "Kizomba",
+        3: "Salsa",
     }
-    return genre_list.get(prediction, "Cannot determine the right style")
+    return genre_list.get(prediction, "unfortunately not a style this system understands")
 
 # recorded_data_preparation()
 # model_predict()
